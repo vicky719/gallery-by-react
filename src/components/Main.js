@@ -1,6 +1,7 @@
 require('normalize.css/normalize.css');
 require('styles/App.scss');
 
+
 import React from 'react';
 
 var imageDatas = require('../sources/imgConfig.json');
@@ -46,12 +47,13 @@ class ImgFigure extends React.Component {
         styleObj[v + 'Transform'] = 'rotate(' + this.props.arrange.rotate + 'deg)'
       }.bind(this));
     }
-    //如果是居中的图片，z-index设为11
-    if(this.props.arrange.isCenter){
-      styleObj.zIndex=11;
-    }
     var imgFigureClassName = 'img-figure';
     imgFigureClassName += this.props.arrange.isInVerse ? ' is-inverse' : '';
+    
+    //如果是居中的图片，z-index设为11
+    if (this.props.arrange.isCenter) {
+      styleObj.zIndex = 11;
+    }
     return (
       <figure style={styleObj} className={imgFigureClassName} ref="img" onClick={this.handleClick}>
         <img src={this.props.data.src} alt={this.props.data.title}/>
@@ -65,6 +67,30 @@ class ImgFigure extends React.Component {
         </figcaption>
       </figure>
     )
+  }
+}
+
+//控制按钮组件
+class ControllerUnit extends React.Component {
+  handleClick = (e) => {
+    if (this.props.arrange.isCenter) {
+      this.props.inverse();
+    } else {
+      this.props.center();
+    }
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  
+  render() {
+    let className = 'controller-unit';
+    if (this.props.arrange.isCenter) {
+      className += ' icon-turn-arrow is-center';
+      if (this.props.arrange.isInVerse) {
+        className += ' is-inverse'
+      }
+    }
+    return (<span className={className} onClick={this.handleClick}></span>);
   }
 }
 
@@ -262,6 +288,8 @@ class AppComponent extends React.Component {
       }
       imgFigures.push(<ImgFigure data={value} key={k} ref={'imgFigure' + k} inverse={this.inverse(k)}
                                  arrange={this.state.imgsArrangeArr[k]} center={this.center(k)}/>)
+      controllerUnits.push(<ControllerUnit key={k} arrange={this.state.imgsArrangeArr[k]} center={this.center(k)}
+                                           inverse={this.inverse(k)}/>);
     }.bind(this));//bind this指向react环境对象
     return (
       <section className="stage" ref="stage">
